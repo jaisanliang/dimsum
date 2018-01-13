@@ -1,0 +1,16 @@
+<p>Share your favorite foods!<p/>
+
+<form action='register' method='post'>
+<input type='text' name='username' placeholder='Username'/>
+<input type='email' name='email' placeholder='Email address'/>
+<input type='password' name='password' placeholder='Password'/>
+<input type='password' name='password_confirmation' placeholder='Confirm password'/>
+<input type='submit' value='Start sharing!'/>
+{% csrf_token %}
+</form>
+
+<style>
+input {
+    display: block;
+}
+</style>

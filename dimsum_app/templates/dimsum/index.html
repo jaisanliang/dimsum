@@ -1,0 +1,55 @@
+<form action='search' method='post'>
+    <input type='text' name='dish' placeholder='I want this'/>
+    <input type='submit' value='Look for food!'/>
+    {% csrf_token %}
+</form>
+
+<div id='map'></div>
+
+{% for restaurant in restaurant_list %}
+    <p>{{ restaurant.name }}</p>
+{% endfor %}
+
+<script async defer 
+    src='https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap'>
+</script>
+
+<script>
+/**
+Add markers for the top restaurants in an area
+*/
+function initMap() {
+    var city = {lat: 37.3861, lng: -122.0839};
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        center: city
+    });
+    
+    {% for restaurant in restaurant_list|slice:':10' %}
+        var name = "{{ restaurant.name | safe }}";
+        addMarker(name, {{ restaurant.latitude }}, {{ restaurant.longitude }}, map);
+    {% endfor %}
+}
+
+/**
+*/
+function addMarker(name, latitude, longitude, map) {
+    var marker = new google.maps.Marker({
+        position: {lat: latitude, lng: longitude},
+        map: map
+    });
+    marker.addListener('click', function() {
+        var infowindow = new google.maps.InfoWindow({
+            content: name
+        });
+        infowindow.open(map, marker);
+    });
+}
+</script>
+
+<style>
+#map {
+    width: 400px;
+    height: 400px;
+}
+</style>
