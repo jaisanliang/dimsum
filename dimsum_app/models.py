@@ -75,13 +75,3 @@ class Photo(models.Model):
     dish = models.ForeignKey(Dish)
     image = models.ImageField()
     description = models.CharField(max_length=1000)
-
-
-class User(models.Model):
-    username = models.CharField(max_length=50)
-    email = models.CharField(max_length=50)
-    salt = models.CharField(max_length=50)
-    hashed_password = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.username

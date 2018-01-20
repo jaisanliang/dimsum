@@ -1,3 +1,18 @@
+{% if user.is_authenticated %}
+<p>Welcome {{ user.username }}!</p>
+<p><a href='signout'>Sign out</a></p>
+
+{% else %}
+<p>Sign in or <a href='signup'>sign up</a>!<p/>
+
+<form action='signin' method='post'>
+<input type='text' name='username' placeholder='Username'/>
+<input type='password' name='password' placeholder='Password'/>
+<input type='submit' value='Sign in!'/>
+{% csrf_token %}
+</form>
+{% endif %}
+
 <form action='search' method='post'>
     <input type='text' name='dish' placeholder='I want this'/>
     <input type='submit' value='Look for food!'/>
@@ -48,6 +63,10 @@ function addMarker(name, latitude, longitude, map) {
 </script>
 
 <style>
+input {
+    display: block;
+}
+
 #map {
     width: 400px;
     height: 400px;

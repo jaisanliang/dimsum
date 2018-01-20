@@ -1,0 +1,15 @@
+Change settings for {{ user.username }}
+
+<form action='change_password' method='post'>
+<input type='password' name='old_password' placeholder='Old password'/>
+<input type='password' name='new_password' placeholder='New password'/>
+<input type='password' name='new_password_confirmation' placeholder='Confirm new password'/>
+<input type='submit' value='Change password'/>
+{% csrf_token %}
+</form>
+
+<style>
+input {
+    display: block;
+}
+</style>
