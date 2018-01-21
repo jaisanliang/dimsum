@@ -12,4 +12,8 @@ urlpatterns = [
     url(r'^register$', views.register, name='register'),
 
     url(r'^search$', views.searchResults, name='search'),
+    url(r'^restaurant$', views.restaurant, name='restaurant'),
+    url(r'^dish$', views.dish, name='dish'),
+    url(r'^write_review$', views.write_review, name='write_review'),
+    url(r'^delete_review$', views.delete_review, name='delete_review')
 ]

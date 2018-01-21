@@ -1,3 +1,14 @@
-{% for dish in dishes %}
-    <p>{{ dish }}</p>
+<table>
+{% for dish, restaurant_id, restaurant_name in dishes %}
+    <tr>
+        <td>
+            {% if dish.num_ratings == 0 %}
+                Not rated yet
+            {% else %}
+                {{ dish.rating }}
+            {% endif %}
+        </td>
+        <td>{{ dish.name }} from <a href='restaurant?id={{ restaurant_id }}'>{{ restaurant_name }}</a></td>
+    </tr>
 {% endfor %}
+</table>

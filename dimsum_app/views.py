@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -81,9 +81,70 @@ def change_password(request):
 
 def searchResults(request):
     dish = request.POST['dish']
-    results = search.search_dishes(dish)
-    dishes = [result.name for result in results]
+    #results = search.search_dishes(dish)
+    results = Dish.objects.filter(name__contains=dish).order_by('-rating')
+    # dishes = [(result.name, result.restaurant_id, result.restaurant_name)
+    #          for result in results]
+    dishes = [(result, result.restaurant.id, result.restaurant.name)
+              for result in results]
     context = {
         'dishes': dishes
     }
     return render(request, 'dimsum/results.html', context)
+
+
+def restaurant(request):
+    restaurant_id = request.GET['id']
+    restaurant = Restaurant.objects.get(pk=restaurant_id)
+    dishes = Dish.objects.filter(restaurant=restaurant)
+    context = {
+        'restaurant': restaurant,
+        'dishes': dishes
+    }
+    return render(request, 'dimsum/restaurant.html', context)
+
+
+def dish(request):
+    food_id = request.GET['id']
+    restaurant_id, dish = food_id.split('_')
+    restaurant = Restaurant.objects.get(pk=restaurant_id)
+    dish = Dish.objects.filter(restaurant_id=restaurant_id, name=dish)[0]
+    reviews = Review.objects.filter(dish=dish)
+    context = {
+        'restaurant': restaurant,
+        'dish': dish,
+        'reviews': reviews
+    }
+    return render(request, 'dimsum/dish.html', context)
+
+
+def write_review(request):
+    restaurant_id = request.POST['restaurant_id']
+    dish_name = request.POST['dish_name']
+    review_text = request.POST['review']
+    rating = int(request.POST['rating'])
+    dish = Dish.objects.filter(restaurant_id=restaurant_id, name=dish_name)[0]
+    dish.rating = 1.0 * (float(dish.rating) *
+                         dish.num_ratings + rating) / (dish.num_ratings + 1)
+    dish.num_ratings += 1
+    dish.save()
+    review = Review.objects.create(
+        dish=dish, review=review_text, rating=rating, author=request.user)
+    return HttpResponseRedirect('dish?id={}_{}'.format(restaurant_id, dish_name))
+
+
+def delete_review(request):
+    restaurant_id = request.POST['restaurant_id']
+    dish_name = request.POST['dish_name']
+    review_id = request.POST['id']
+    review = Review.objects.get(id=review_id)
+    dish = Dish.objects.filter(restaurant_id=restaurant_id, name=dish_name)[0]
+    if dish.num_ratings == 1:
+        dish.rating = 0
+    else:
+        dish.rating = 1.0 * (float(dish.rating) *
+                             dish.num_ratings - review.rating) / (dish.num_ratings - 1)
+    dish.num_ratings -= 1
+    dish.save()
+    review.delete()
+    return HttpResponseRedirect('dish?id={}_{}'.format(restaurant_id, dish_name))

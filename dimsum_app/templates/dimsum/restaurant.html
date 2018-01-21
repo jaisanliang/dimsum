@@ -1,0 +1,11 @@
+{{ restaurant.name }}
+
+<table>
+{% for dish in dishes %}
+    <tr>
+        <td>{{ dish.rating }}</td>
+        <td><a href='dish?id={{ restaurant.id }}_{{ dish.name }}'>{{ dish.name }}</a></td>
+        <td>{{ dish.price }}</td>
+    </tr>
+{% endfor %}
+</table>

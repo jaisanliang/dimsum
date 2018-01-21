@@ -12,7 +12,8 @@ https://medium.freecodecamp.org/elasticsearch-with-django-the-easy-way-909375bc1
 
 
 class DishIndex(DocType):
-    restaurant = Text()
+    restaurant_name = Text()
+    restaurant_id = Text()
     name = Text()
     price = Float()
     description = Text()
@@ -24,23 +25,8 @@ class DishIndex(DocType):
 
 def search_dishes(dish):
     connections.create_connection()
-    search = Search().filter('term', name=dish)
+    search = Search().query('match', name=dish)
+    num_results = search.count()
+    search = search[0:num_results]
     response = search.execute()
     return response
-
-
-def bulk_index_dishes():
-    DishIndex.init()
-    es = Elasticsearch()
-    bulk(client=es, actions=[{'_index': 'dish-index', '_type': 'dish',
-                              '_source': dish.indexing()} for dish in models.Dish.objects.all().iterator()])
-
-if __name__ == '__main__':
-    import os
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dimsum_project.settings')
-    from django.core.wsgi import get_wsgi_application
-    application = get_wsgi_application()
-
-    import models
-
-    connections.create_connection()

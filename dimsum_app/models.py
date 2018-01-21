@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import random
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 import search
@@ -38,7 +39,8 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(decimal_places=2, max_digits=10)
     description = models.CharField(max_length=1000)
-    rating = models.DecimalField(decimal_places=2, max_digits=3)
+    rating = models.DecimalField(decimal_places=2, max_digits=3, default=3)
+    num_ratings = models.IntegerField(default=0)
 
     class Meta:
         abstract = True
@@ -51,7 +53,8 @@ class Dish(MenuItem):
 
     def indexing(self):
         obj = search.DishIndex(
-            restaurant=self.restaurant.name,
+            restaurant_name=self.restaurant.name,
+            restaurant_id=self.restaurant.id,
             name=self.name,
             price=self.price,
             description=self.description,
@@ -69,6 +72,7 @@ class Review(models.Model):
     dish = models.ForeignKey(Dish)
     review = models.CharField(max_length=1000)
     rating = models.PositiveIntegerField()
+    author = models.ForeignKey(User)
 
 
 class Photo(models.Model):
